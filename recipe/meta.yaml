@@ -1,5 +1,5 @@
 {% set name = "badger-opt" %}
-{% set version = "0.5.0" %}
+{% set version = "0.5.1" %}
 
 
 package:
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/badger-opt-{{ version }}.tar.gz
-  sha256: 7663692f0a13c9451e9189d3b6c15fcd7a4370a6389ac12fb7a9c6c642c5aa70
+  sha256: 7a12849df5aaecd6bf52eee67f977e80ad82135ce5a2f5fb7ff700e5fa4344a4
 
 build:
   number: 0
@@ -18,9 +18,17 @@ build:
   script: {{ PYTHON }} -m pip install . -vv
 
 requirements:
+  build:
+    - {{ cdt('mesa-libgl-devel') }}  # [linux]
+    - {{ cdt('mesa-dri-drivers') }}  # [linux]
+    - {{ cdt('libselinux') }}  # [linux]
+    - {{ cdt('libxdamage') }}  # [linux]
+    - {{ cdt('libxxf86vm') }}  # [linux]
+    - {{ cdt('libxext') }}     # [linux]
   host:
     - pip
     - python >=3.6
+    - xorg-libxfixes  # [linux]
   run:
     - coolname
     - pandas
@@ -34,12 +42,16 @@ requirements:
 test:
   imports:
     - badger
-    - badger.actions
+  files:
+    - tests
   commands:
     - pip check
     - badger --help
+    - pytest tests
   requires:
     - pip
+    - pytest
+    - pytest-qt
 
 about:
   home: https://github.com/SLAC-ML/Badger
